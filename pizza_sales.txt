@@ -2,18 +2,24 @@
 select*
 from pizza_sales
 
+--Total Revenue
 select SUM(total_price) as Total_Revenue
 from pizza_sales 
 
+--Average Order Value
 select sum(total_price)/ count(distinct order_id) as Avg_Order_Value
 from pizza_sales
 
+--Total Pizzas Sold
 select sum(quantity) as Total_Pizza_Sold
 from pizza_sales
 
+--Total Orders
 select COUNT(distinct order_id) as Total_orders
 from pizza_sales
 
+
+--Average Pizzas Per Order
 select cast(cast (sum(quantity) as decimal(10,2)) / cast(count(distinct order_id) as decimal(10,2)) as decimal(10,2))
 as Avg_Pizzas_Per_Order
 from pizza_sales
@@ -21,45 +27,77 @@ from pizza_sales
 select*
 from pizza_sales
 
+--Daily Trend for Total Orders
 select DATENAME(DW, order_date) as order_day, count(distinct order_id) AS Total_orders
 from pizza_sales
 Group by DATENAME(DW, order_date)
 
+--Monthly Trend for Orders
 select DATENAME(MONTH,order_date) as Month_Name, Count(distinct order_id) as Total_Orders
 from pizza_sales
 group by DATENAME(month, order_date)
 order by Total_Orders desc
 
 
+--% of Sales of Pizza Category
 select pizza_category, cast(sum(total_price) as decimal(10,2)) as Total_Sales, 
 cast(sum(total_price) *100 / (select sum(total_price) from pizza_sales) as decimal(10,2)) as PCT
 from pizza_sales 
 group by pizza_category
 order by PCT desc
 
+--% of Sales by Pizza Size
 select pizza_size, cast(sum(total_price) as decimal(10,2)) as Total_Sales, 
 cast(sum(total_price) *100 / (select sum(total_price) from pizza_sales where DATEPART(Quarter, order_date) =1) as decimal(10,2)) as PCT
 from pizza_sales 
 group by pizza_size
-order by PCT desc
+order by pizza_size
 
+--Total Pizzas Sold by Pizza Category
+select pizza_category, SUM(quantity) as Total_Quantity Sold 
+from pizza_sales
+where MONTH(order_date) = 2
+group by pizza_category
+order by Total_Quantity Sold desc
+
+
+--Top 5 Pizzas by Revenue 
 select TOP 5 pizza_name, SUM(total_price) as Total_Revenue 
 from pizza_sales
 group by pizza_name
 order by Total_Revenue desc
 
-
+-- Bottom 5 Pizzas by Revenue
 select TOP 5 pizza_name, SUM(total_price) as Total_Revenue 
 from pizza_sales
 group by pizza_name
 order by Total_Revenue asc
 
+--Bottom 5 Pizzas Sold by Pizza Category
 select TOP 5 pizza_name, SUM(quantity) as Total_Quantity
 from pizza_sales
 group by pizza_name
 order by Total_Quantity asc
 
---best sellers
+--Top 5 Pizzas Sold by Pizza Category
+select TOP 5 pizza_name, SUM(quantity) as Total_Quantity
+from pizza_sales
+group by pizza_name
+order by Total_Quantity desc
+
+--Top 5 Pizzas Sold by Total Orders
+select TOP 5 pizza_name, count(distinct order_id) as Total_Orders
+from pizza_sales
+group by pizza_name
+order by Total Orders desc
+
+--Bottom 5 Pizzas Sold by Total Orders
+select TOP 5 pizza_name, count(distinct order_id) as Total_Orders
+from pizza_sales
+group by pizza_name
+order by Total Orders asc
+
+--Best Sellers
 select TOP 5 pizza_name, count(distinct order_id) as Total_Orders
 from pizza_sales
 group by pizza_name
